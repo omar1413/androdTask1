@@ -72,6 +72,8 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this,RegisterActivity.class);
         startActivity(intent);
+
+        finish();
     }
 
     private void login(){
@@ -88,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onChanged(User user) {
                 if(user != null){
                     Log.d(TAG, "i am here in success");
-                    goToHomeActivity(user.getId());
+                    goToHomeActivity(user.getUsername());
                 }else{
                     Log.d(TAG, "i am here in error");
                     etUsername.setError("wrong");
@@ -101,8 +103,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void goToHomeActivity(long id){
-        MySharedPref.getInstance(this).saveLogIn(id);
+    private void goToHomeActivity(String username){
+        MySharedPref.getInstance(this).saveLogIn(username);
 
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -112,10 +114,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean checkLogin(){
-        long logId =  MySharedPref.getInstance(this).isLoggedIn();
+        String username =  MySharedPref.getInstance(this).isLoggedIn();
 
-        if(logId != -1){
-            goToHomeActivity(logId);
+        if(username != null){
+            goToHomeActivity(username);
             return true;
         }
 

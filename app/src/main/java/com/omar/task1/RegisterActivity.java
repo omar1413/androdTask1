@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.omar.task1.db.AppDatabase;
 import com.omar.task1.db.entity.User;
+import com.omar.task1.utils.MySharedPref;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -63,34 +64,50 @@ public class RegisterActivity extends AppCompatActivity {
         AppDatabase.getInstance(this).getUserDao().getUser(username).observe(this, new Observer<User>() {
             @Override
             public void onChanged(User user) {
-                if(user == null){
-                    new Thread(){
+                if (user == null) {
+                    new Thread() {
                         @Override
                         public void run() {
-                            AppDatabase.getInstance(RegisterActivity.this).getUserDao().insert(new User(username,password));
+                            AppDatabase.getInstance(RegisterActivity.this).getUserDao().insert(new User(username, password));
+
+
+                            MySharedPref.getInstance(RegisterActivity.this).saveLogIn(username);
+
+
+
                         }
                     }.start();
-
                     goToHomeActivity();
-                }
-                else{
+
+                } else {
                     etUsername.setError(getString(R.string.user_exist_error));
                 }
             }
         });
 
 
-
-
     }
 
-    private void goToHomeActivity(){
-        Intent intent = new Intent(this,HomeActivity.class);
+    private void goToHomeActivity() {
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
 
         finish();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        goToLoginActivity();
+
+    }
+
+    private void  goToLoginActivity(){
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+        finish();
     }
 }

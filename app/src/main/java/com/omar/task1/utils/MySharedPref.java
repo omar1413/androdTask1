@@ -26,13 +26,13 @@ public class MySharedPref {
         return instance;
     }
 
-    public long isLoggedIn() {
-        return sharedPreferences.getLong(LOGIN_ID, -1);
+    public String isLoggedIn() {
+        return sharedPreferences.getString(LOGIN_ID, null);
 
     }
 
-    public void saveLogIn(long id) {
-        sharedPreferences.edit().putLong(LOGIN_ID, id).apply();
+    public void saveLogIn(String username) {
+        sharedPreferences.edit().putString(LOGIN_ID, username).apply();
 
     }
 }

@@ -17,6 +17,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE username=:username AND password=:password")
     LiveData<User> getUser(String username, String password);
 
+    @Query("SELECT * FROM users WHERE id=:id")
+    LiveData<User> getUser(long id);
+
 
     @Query("SELECT * FROM users WHERE username=:username")
     LiveData<User> getUser(String username);
