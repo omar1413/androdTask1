@@ -9,6 +9,7 @@
     android:orientation="vertical"
     android:layout_gravity="center"
     android:gravity="center"
+    android:padding="@dimen/padding_sides"
     >
 
     <LinearLayout
@@ -16,6 +17,7 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/tvUsernameText"
             android:textSize="25sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,6 +39,7 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/tvPasswordText"
             android:textSize="25sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

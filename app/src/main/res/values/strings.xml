@@ -8,13 +8,23 @@
     <string name="btn_login">Sign In</string>
     <string name="label_register_activity">Registration</string>
 
-    <string name="tv_register">No account yet? Create one</string>
+    <string name="tv_register"> Create one</string>
 
 
     <string name="log_out">log out</string>
     <string name="username_empty_error">username is empty</string>
-    <string name="password_empty_error">password is empty</string>
+    <string name="password_not_valid_error">password should have at least 8 cahrs and most 12 chars, have 1 small char , 1 capital char, 1 number</string>
     <string name="user_exist_error">User already exist</string>
     <string name="user_name_label">user name :</string>
     <string name="password_label">password :</string>
+    <string name="login_label">Login</string>
+    <string name="register_label">Register</string>
+    <string name="no_account_yet_label">No account yet? </string>
+    <string name="wrong_password_error">wrong password</string>
+    <string name="wrong_user_name_error">wrong username</string>
+
+
+    <string name="facebook_app_id" translatable="false">338507363775549</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb338507363775549</string>
+    <string name="email_label">Email : </string>
 </resources>

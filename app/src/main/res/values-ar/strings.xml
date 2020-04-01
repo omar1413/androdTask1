@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task1</string>
+
+    <string name="btn_register">تسجيل</string>
+    <string name="hint_et_username">اسم المستخدم</string>
+    <string name="hint_et_pass">الرقم السري</string>
+
+    <string name="btn_login">تسجيل الدخول</string>
+    <string name="label_register_activity">انشاء حساب جديد</string>
+
+    <string name="tv_register">انشاء حساب جديد</string>
+
+
+    <string name="log_out">تسجيل الخروج</string>
+    <string name="username_empty_error">اسم المستخدم فارغ</string>
+    <string name="password_not_valid_error">الرقم السري يجب ان يتكون من 8 احرف الى 12 حرف ويجب ان يحتوى على حرف واحد صغير وواحد كبير ورقم</string>
+    <string name="user_exist_error">اسم المستخدم موجود بالفعل</string>
+    <string name="user_name_label">اسم المستخدم : </string>
+    <string name="password_label">الرقم السري : </string>
+    <string name="login_label">دخول</string>
+    <string name="register_label">تسجيل</string>
+    <string name="no_account_yet_label">ليس لديك حساب بعد ؟  </string>
+    <string name="wrong_password_error">الرقم السري خاطئ</string>
+    <string name="wrong_user_name_error">اسم المستخدم خاطئ</string>
+    <string name="email_label">الاميل : </string>
+</resources>
