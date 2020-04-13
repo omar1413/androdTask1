@@ -1,7 +1,11 @@
 package com.omar.task1;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
@@ -10,16 +14,21 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.google.android.material.navigation.NavigationView;
 import com.omar.task1.db.AppDatabase;
 import com.omar.task1.db.entity.User;
+import com.omar.task1.fragments.HomeFragment;
+import com.omar.task1.fragments.ProfileFragment;
 import com.omar.task1.utils.MySharedPref;
 
 public class HomeActivity extends AppCompatActivity {
@@ -30,18 +39,64 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvUsernameText;
     private TextView tvPasswordText;
     private MySharedPref prefs;
+    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        prefs = MySharedPref.getInstance(this);
 
-        initViews();
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setNavigationIcon(R.drawable.ic_menu_24px);
+//        toolbar.setTitle("Title");
+
+//        toolbar.setLogo(R.drawable.ic_launcher);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        final NavigationView nav_view = findViewById(R.id.nav_view);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        //drawerLayout.addDrawerListener(toggle);
+        //toggle.syncState();
+
+
+        //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new SearchFragment()).commit();
+
+        nav_view.setCheckedItem(R.id.home);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new HomeFragment()).commit();
+
+
+        nav_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+                switch(menuItem.getItemId()) {
+                    case R.id.home:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new HomeFragment()).commit();
+                        break;
+//
+                    case R.id.profile:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ProfileFragment()).commit();
+
+                        break;
+                }
+
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
 
     }
+
 
     private void getFacebookUser() {
         tvUsernameText.setText(R.string.email_label);
@@ -52,19 +107,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-    private void initViews() {
-        tvUsername = findViewById(R.id.tvUsernameLabel);
-        tvPassword = findViewById(R.id.tvPasswordLabel);
 
-        tvUsernameText = findViewById(R.id.tvUsernameText);
-        tvPasswordText = findViewById(R.id.tvPasswordText);
-
-        if(prefs.getToken() == null) {
-            getUser();
-        }else{
-            getFacebookUser();
-        }
-    }
 
 
     private void getUser() {

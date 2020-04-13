@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/home"
+            android:title="@string/home_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+
+        <item android:id="@+id/profile"
+            android:title="@string/profile_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+
+        <item android:id="@+id/orders"
+            android:title="@string/orders_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+        <item android:id="@+id/wishList"
+            android:title="@string/wish_list_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+        <item android:id="@+id/payment"
+            android:title="@string/payment_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+
+        <item android:id="@+id/settings"
+            android:title="@string/settings_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+        <item android:id="@+id/aboutUs"
+            android:title="@string/about_us_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+        <item android:id="@+id/contactUs"
+            android:title="@string/contact_us_nav_menu_lable"
+            android:icon="@android:drawable/ic_menu_agenda">
+        </item>
+    </group>
+
+
+</menu>

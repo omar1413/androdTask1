@@ -20,8 +20,20 @@
         <item name="colorControlActivated">@color/edittext_floating</item>
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColorHint">@android:color/white</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+
+
 <!--        <item name="android:popupBackground">#000</item>-->
 <!--        <item name="android:actionMenuTextColor">#000</item>-->
     </style>
+
+
+    <style name="LoginTheme.NoActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
 
 </resources>

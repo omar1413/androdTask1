@@ -27,4 +27,21 @@
     <string name="facebook_app_id" translatable="false">338507363775549</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb338507363775549</string>
     <string name="email_label">Email : </string>
+    <string name="hint_et_email">Email</string>
+    <string name="hint_et_phone">Phone</string>
+    <string name="hint_et_address">Address</string>
+    <string name="hint_et_gender">Gender</string>
+    <string name="tv_restore">Forgot password ?</string>
+    <string name="btn_restore">restore password</string>
+    <string name="home_nav_menu_lable">Home</string>
+    <string name="orders_nav_menu_lable">Orders</string>
+    <string name="wish_list_nav_menu_lable">Wish List</string>
+    <string name="payment_nav_menu_lable">Payment</string>
+    <string name="settings_nav_menu_lable">Settings</string>
+    <string name="about_us_nav_menu_lable">About Us</string>
+    <string name="contact_us_nav_menu_lable">Contact Us</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profile_nav_menu_lable">Profile</string>
 </resources>

@@ -74,6 +74,18 @@
                 android:text="@string/btn_login"
                 android:textSize="@dimen/text_medium" />
 
+            <TextView
+                android:id="@+id/tvRestore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="@dimen/padding_small"
+                android:clickable="true"
+                android:linksClickable="false"
+                android:text="@string/tv_restore"
+                android:textSize="@dimen/text_small"
+                android:textStyle="bold" />
+
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/login_button"
                 android:layout_width="match_parent"
