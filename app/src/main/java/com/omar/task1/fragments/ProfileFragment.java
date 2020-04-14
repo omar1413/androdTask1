@@ -2,13 +2,28 @@ package com.omar.task1.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.omar.task1.R;
+import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.services.UserService;
+import com.omar.task1.app.Const;
+import com.omar.task1.utils.MySharedPref;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +39,14 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+
+    private ImageView imgProfile;
+    private TextView tvUsername;
+    private TextView tvEmail;
+    private TextView tvPhone;
+    private TextView tvGender;
+    private TextView tvAddress;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -54,6 +77,51 @@ public class ProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView(view);
+    }
+
+    private void initView(View v){
+        imgProfile = v.findViewById(R.id.imgProfile);
+        tvUsername = v.findViewById(R.id.tvUsername);
+        tvEmail = v.findViewById(R.id.tvEmail);
+        tvGender = v.findViewById(R.id.tvGender);
+        tvAddress = v.findViewById(R.id.tvAddress);
+        tvPhone = v.findViewById(R.id.tvPhone);
+
+        getUser();
+    }
+
+    private void getUser(){
+        String jwt = MySharedPref.getInstance(getActivity()).isLoggedIn();
+        UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
+        userService.get(jwt).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<UserModel>>() {
+                    @Override
+                    public void onSuccess(Response<UserModel> userModelResponse) {
+                        if(userModelResponse.code() == 200) {
+
+                            UserModel user = userModelResponse.body();
+                            Glide.with(getContext()).load(Const.BASE_URL + "file/" + user.getProfileImage()).into(imgProfile);
+                            tvUsername.setText(user.getUsername());
+                            tvEmail.setText(user.getEmail());
+                            tvPhone.setText(user.getPhone());
+                            tvAddress.setText(user.getAddress());
+                            tvGender.setText(user.getGender());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
     }
 
     @Override

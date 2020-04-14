@@ -90,7 +90,8 @@ public class HomeFragment extends Fragment {
 
 
     private void getProfilePic(){
-        String jwt = prefs.getToken();
+        prefs = MySharedPref.getInstance(getActivity());
+        String jwt = prefs.isLoggedIn();
         UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
         userService.get(jwt).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<UserModel>>() {

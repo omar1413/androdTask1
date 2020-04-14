@@ -44,4 +44,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="profile_nav_menu_lable">Profile</string>
+    <string name="email_empty_error">Email is Empty</string>
+    <string name="phone_empty_error">Phone is empty</string>
+    <string name="address_empty_error">Address is empty</string>
+    <string name="gender_empty_error">Gender is empty</string>
 </resources>
