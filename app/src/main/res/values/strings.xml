@@ -48,4 +48,9 @@
     <string name="phone_empty_error">Phone is empty</string>
     <string name="address_empty_error">Address is empty</string>
     <string name="gender_empty_error">Gender is empty</string>
+    <string name="hint_et_code">Code</string>
+    <string name="hint_et_new_pass">New Password</string>
+    <string name="token_empty_error">token is empty</string>
+    <string name="password_empty_error">password is empty</string>
+    <string name="invalid_username_password">username or password are incorrect</string>
 </resources>

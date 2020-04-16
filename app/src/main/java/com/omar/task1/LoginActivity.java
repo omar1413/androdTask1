@@ -29,15 +29,25 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.UserLogin;
+import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.services.UserService;
 import com.omar.task1.db.AppDatabase;
 import com.omar.task1.db.entity.User;
 import com.omar.task1.utils.MySharedPref;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.omar.task1.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -54,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+    private TextView tvRestore;
 
     private MySharedPref prefUtil;
     private CallbackManager callbackManager = CallbackManager.Factory.create();
@@ -189,6 +200,7 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister = findViewById(R.id.tvRegister);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
+        tvRestore = findViewById(R.id.tvRestore);
 
         tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +209,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        tvRestore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToRestorePasswordActivity();
+            }
+        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +223,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void goToRestorePasswordActivity(){
+        Intent intent = new Intent(this,RestorePasswordActivity.class);
+        startActivity(intent);
     }
 
     private void goToRegisterActivity(){
@@ -224,31 +247,52 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "i am here in login -" + username + "-");
         Log.d(TAG, "i am here in login  -" + password + "-");
 
-        user.observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(User user) {
-                if(user != null){
-                    if (user.getPassword().equals(password)){
-                        goToHomeActivity(user.getUsername());
-                    }else{
-                        etPassword.setError(getString(R.string.wrong_password_error));
+        UserLogin userLogin = new UserLogin(username,password);
+
+
+        ApiClient.getClient(this).create(UserService.class).signin(userLogin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<Void>>() {
+                    @Override
+                    public void onSuccess(Response response) {
+                        if(response.code() == 200){
+                            goToHomeActivity(response.headers().get("Authorization"));
+                        }else{
+                            Utils.errorAlert(LoginActivity.this, getString(R.string.invalid_username_password));
+                        }
                     }
 
-
-                }else{
-                    Log.d(TAG, "i am here in error");
-                    etUsername.setError(getString(R.string.wrong_user_name_error));
-
-                    //Toast.makeText(LoginActivity.this, "error", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onError(Throwable e) {
+                        Utils.errorAlert(LoginActivity.this, "check you connection");
+                    }
                 }
-            }
-        });
+        );
+
+//        user.observe(this, new Observer<User>() {
+//            @Override
+//            public void onChanged(User user) {
+//                if(user != null){
+//                    if (user.getPassword().equals(password)){
+//                        goToHomeActivity(user.getUsername());
+//                    }else{
+//                        etPassword.setError(getString(R.string.wrong_password_error));
+//                    }
+//
+//
+//                }else{
+//                    Log.d(TAG, "i am here in error");
+//                    etUsername.setError(getString(R.string.wrong_user_name_error));
+//
+//                    //Toast.makeText(LoginActivity.this, "error", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
 
     }
 
 
-    private void goToHomeActivity(String username){
-        MySharedPref.getInstance(this).saveLogIn(username);
+    private void goToHomeActivity(String token){
+        MySharedPref.getInstance(this).saveLogIn(token);
 
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -1,5 +1,6 @@
 package com.omar.task1.api.services;
 
+import com.omar.task1.api.models.UserLogin;
 import com.omar.task1.api.models.UserModel;
 
 
@@ -20,5 +21,8 @@ public interface UserService {
 
     @GET("users")
     Single<Response<UserModel>> get(@Header("Authorization") String authorization);
+
+    @POST("users/sign-in")
+    Single<Response<Void>> signin(@Body UserLogin user);
 
 }

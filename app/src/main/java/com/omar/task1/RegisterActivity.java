@@ -155,13 +155,10 @@ public class RegisterActivity extends AppCompatActivity {
                     //IDProf.setImageBitmap(bitmap);
                    // BitMapToString(bitmap);
                     profileImage.setImageBitmap(bitmap);
-                    String path = android.os.Environment
-                            .getExternalStorageDirectory()
-                            + File.separator
-                            + "Phoenix" + File.separator + "default";
+
 
                     OutputStream outFile = null;
-                    File picFile = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
+                    File picFile = new File(getCacheDir(), String.valueOf(System.currentTimeMillis()) + ".jpg");
                     try {
                         outFile = new FileOutputStream(picFile);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
