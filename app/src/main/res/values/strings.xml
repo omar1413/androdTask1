@@ -53,4 +53,7 @@
     <string name="token_empty_error">token is empty</string>
     <string name="password_empty_error">password is empty</string>
     <string name="invalid_username_password">username or password are incorrect</string>
+    <string name="edit_label">Edit</string>
+    <string name="btn_save">save</string>
+    <string name="btn_edit">Edit</string>
 </resources>

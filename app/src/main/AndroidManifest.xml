@@ -16,8 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/LoginTheme">
-        <activity android:name=".NewPasswordActivity"/>
-        <activity android:name=".RestorePasswordActivity"/>
+        <activity android:name=".UpdateActivity"></activity>
+        <activity android:name=".NewPasswordActivity" />
+        <activity android:name=".RestorePasswordActivity" />
         <activity android:name=".CheckCodeActivity" />
 
         <meta-data

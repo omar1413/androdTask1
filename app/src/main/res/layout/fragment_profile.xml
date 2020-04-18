@@ -137,7 +137,21 @@
             android:layout_height="match_parent"
             android:text="Omar"
             android:textSize="@dimen/text_medium" />
+
+
+
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btnEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/my_button"
+        android:text="@string/btn_edit"
+        android:textSize="@dimen/text_medium" />
+
 
 </LinearLayout>
 </ScrollView>

@@ -11,6 +11,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface UserService {
@@ -24,5 +25,9 @@ public interface UserService {
 
     @POST("users/sign-in")
     Single<Response<Void>> signin(@Body UserLogin user);
+
+
+    @PUT("users")
+    Single<Response<UserModel>> update(@Header("Authorization") String authorization,@Body UserModel user);
 
 }

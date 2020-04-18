@@ -239,6 +239,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(){
+
         String username = etUsername.getText().toString().trim();
         final String password = etPassword.getText().toString().trim();
 
