@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -63,7 +64,7 @@ public class UpdateActivity extends AppCompatActivity {
     private EditText etPassword;
     private EditText etEmail;
     private EditText etPhone;
-    private EditText etGender;
+    private Spinner spinnerGender;
     private EditText etAddress;
     private CircleImageView profileImage;
     private View progressLayout;
@@ -156,8 +157,14 @@ public class UpdateActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etEmail.setText(user.getEmail());
 
-        etGender = findViewById(R.id.etGender);
-        etGender.setText(user.getGender());
+        spinnerGender = findViewById(R.id.spinnerGender);
+        String[] gender = getResources().getStringArray(R.array.gender_array);
+        int pos = 0;
+        if (user.getGender().equals(gender[1])){
+            pos = 1;
+        }
+        spinnerGender.setSelection(pos);
+
 
         etPhone = findViewById(R.id.etPhone);
         etPhone.setText(user.getPhone());
@@ -379,10 +386,10 @@ public class UpdateActivity extends AppCompatActivity {
             valid = false;
         }
 
-        if(gender.isEmpty()){
-            etGender.setError(getString(R.string.gender_empty_error));
-            valid = false;
-        }
+//        if(gender.isEmpty()){
+//            etGender.setError(getString(R.string.gender_empty_error));
+//            valid = false;
+//        }
 
 
 
@@ -399,7 +406,7 @@ public class UpdateActivity extends AppCompatActivity {
         final String email = etEmail.getText().toString().trim();
         final String phone = etPhone.getText().toString().trim();
         final String address = etAddress.getText().toString().trim();
-        final String gender = etGender.getText().toString().trim();
+        final String gender = spinnerGender.getSelectedItem().toString();
         user.setPassword(password);
         user.setEmail(email);
         user.setPhone(phone);

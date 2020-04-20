@@ -8,7 +8,7 @@ public class UserModel extends BaseResponse {
     private String phone;
     private String email;
     private String profileImage;
-    private String Gender;
+    private String gender;
 
 
 
@@ -16,22 +16,23 @@ public class UserModel extends BaseResponse {
 
     public UserModel(){}
 
-    public UserModel( String username, String password,  String email,String phone, String address) {
-        this.id = id;
+    public UserModel( String username, String password,  String email,String phone, String address, String gender) {
+        //this.id = id;
         this.username = username;
         this.password = password;
         this.phone = phone;
         this.email = email;
         this.address = address;
+        this.gender = gender;
     }
 
 
     public String getGender() {
-        return Gender;
+        return gender;
     }
 
     public void setGender(String gender) {
-        Gender = gender;
+        this.gender = gender;
     }
 
     public String getProfileImage() {

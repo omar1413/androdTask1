@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.omar.task1.api.ApiClient;
@@ -61,10 +62,12 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etPassword;
     private EditText etEmail;
     private EditText etPhone;
-    private EditText etGender;
+    private Spinner spinnerGender;
     private EditText etAddress;
     private CircleImageView profileImage;
     private View progressLayout;
+
+    private String mGender;
 
 
     private static final int CAMERA_REQUEST = 1;
@@ -112,11 +115,13 @@ public class RegisterActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etEmail = findViewById(R.id.etEmail);
-        etGender = findViewById(R.id.etGender);
+        spinnerGender = findViewById(R.id.spinnerGender);
         etPhone = findViewById(R.id.etPhone);
         etAddress = findViewById(R.id.etAddress);
         profileImage = findViewById(R.id.profileImage);
         progressLayout = findViewById(R.id.progressLayout);
+
+
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -336,10 +341,10 @@ public class RegisterActivity extends AppCompatActivity {
             valid = false;
         }
 
-        if(gender.isEmpty()){
-            etGender.setError(getString(R.string.gender_empty_error));
-            valid = false;
-        }
+//        if(gender.isEmpty()){
+//            spinnerGender.setError(getString(R.string.gender_empty_error));
+//            valid = false;
+//        }
 
 
 
@@ -355,13 +360,13 @@ public class RegisterActivity extends AppCompatActivity {
         final String email = etEmail.getText().toString().trim();
         final String phone = etPhone.getText().toString().trim();
         final String address = etAddress.getText().toString().trim();
-        final String gender = etGender.getText().toString().trim();
+        final String gender = spinnerGender.getSelectedItem().toString();
 
         if(!validate(username, password,email,phone,address,gender)) return;
 
 
 
-        signUp(new UserModel(username,password,email,phone,address));
+        signUp(new UserModel(username,password,email,phone,address,gender));
 //        AppDatabase.getInstance(this).getUserDao().getUser(username).observe(this, new Observer<User>() {
 //            @Override
 //            public void onChanged(User user) {
@@ -443,7 +448,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     if(response.body() != null && response.body().getError() != null)
                                         Toast.makeText(RegisterActivity.this, response.body().getError() , Toast.LENGTH_SHORT).show();
                                     else{
-                                        Utils.errorAlert(RegisterActivity.this,"Server Error ");                                    }
+                                        Utils.errorAlert(RegisterActivity.this,"User Exist");                                    }
                                 }
                                 hideProgress();
                             }

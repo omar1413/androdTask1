@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.omar.task1.api.ApiClient;
@@ -25,6 +26,24 @@ public class NewPasswordActivity extends AppCompatActivity {
     private Button btnRestore;
 
     private String token = null;
+
+    private LinearLayout progressLayout;
+
+    private void showProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.GONE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +80,14 @@ public class NewPasswordActivity extends AppCompatActivity {
             return;
         }
 
+        showProgress();
+
         ApiClient.getClient(this).create(ResetPasswordService.class).resetPassword(token, newPassword)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<Response<Void>>() {
                     @Override
                     public void onSuccess(Response<Void> voidResponse) {
+                        hideProgress();
                         if(voidResponse.code() == 200){
                             Toast.makeText(NewPasswordActivity.this, "password have been reset", Toast.LENGTH_SHORT).show();
                             goToLoginPage();
@@ -76,6 +98,7 @@ public class NewPasswordActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        hideProgress();
                         Utils.errorAlert(NewPasswordActivity.this, "check your connection");
                     }
                 });

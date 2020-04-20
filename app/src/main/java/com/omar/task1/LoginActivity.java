@@ -70,6 +70,23 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager = CallbackManager.Factory.create();
 
 
+    private LinearLayout progressLayout;
+
+    private void showProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.GONE);
+    }
 
 
     @Override
@@ -250,11 +267,12 @@ public class LoginActivity extends AppCompatActivity {
 
         UserLogin userLogin = new UserLogin(username,password);
 
-
+        showProgress();
         ApiClient.getClient(this).create(UserService.class).signin(userLogin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<Void>>() {
                     @Override
                     public void onSuccess(Response response) {
+                        hideProgress();
                         if(response.code() == 200){
                             goToHomeActivity(response.headers().get("Authorization"));
                         }else{
@@ -264,6 +282,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        hideProgress();
                         Utils.errorAlert(LoginActivity.this, "check you connection");
                     }
                 }

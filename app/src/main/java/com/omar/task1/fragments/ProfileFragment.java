@@ -124,7 +124,7 @@ public class ProfileFragment extends Fragment {
                         if(userModelResponse.code() == 200) {
 
                             UserModel user = userModelResponse.body();
-                            Glide.with(getContext()).load(Const.BASE_URL + "file/" + user.getProfileImage()).into(imgProfile);
+                            Glide.with(getContext()).load(Const.BASE_URL + "file/" + user.getProfileImage()).placeholder(R.drawable.ic_profile).into(imgProfile);
                             tvUsername.setText(user.getUsername());
                             tvEmail.setText(user.getEmail());
                             tvPhone.setText(user.getPhone());

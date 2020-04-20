@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.omar.task1.api.ApiClient;
 import com.omar.task1.api.services.ResetPasswordService;
@@ -21,6 +22,24 @@ public class CheckCodeActivity extends AppCompatActivity {
 
     private EditText etCode;
     private Button btnRestore;
+
+    private LinearLayout progressLayout;
+
+    private void showProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.GONE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,20 +71,23 @@ public class CheckCodeActivity extends AppCompatActivity {
             return;
         }
 
+        showProgress();
         ApiClient.getClient(this).create(ResetPasswordService.class).checkToken(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<Void>>() {
                     @Override
                     public void onSuccess(Response<Void> voidResponse) {
+                        hideProgress();
                         if (voidResponse.code() == 200){
                             gotToNewPasswordActivity(token);
                         }else{
                             Utils.errorAlert(CheckCodeActivity.this,"Invalid Token");
                         }
+
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        hideProgress();
                         Utils.errorAlert(CheckCodeActivity.this,"check your connection");
                     }
                 }

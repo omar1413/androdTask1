@@ -56,4 +56,11 @@
     <string name="edit_label">Edit</string>
     <string name="btn_save">save</string>
     <string name="btn_edit">Edit</string>
+    <string name="code_sent">Code have been sent to email</string>
+
+    <string-array name="gender_array">
+
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
 </resources>

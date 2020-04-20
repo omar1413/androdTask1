@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.StringRes;
@@ -23,6 +24,24 @@ public class RestorePasswordActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private Button btnRestore;
+
+    private LinearLayout progressLayout;
+
+    private void showProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress(){
+        if (progressLayout == null){
+            progressLayout = findViewById(R.id.progressLayout);
+        }
+
+        progressLayout.setVisibility(View.GONE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +72,14 @@ public class RestorePasswordActivity extends AppCompatActivity {
         }
 
 
+        showProgress();
         ResetPasswordService resetPasswordService = ApiClient.getClient(this).create(ResetPasswordService.class);
 
         resetPasswordService.sendToken(email).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<Void>>() {
                     @Override
                     public void onSuccess(Response<Void> stringResponse) {
+                        hideProgress();
                         if(stringResponse.code() == 200){
                             goToCheckCodeActivity();
                         }else{
@@ -70,6 +91,7 @@ public class RestorePasswordActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        hideProgress();
                         Utils.errorAlert(RestorePasswordActivity.this,"Check your connection");
                     }
                 }

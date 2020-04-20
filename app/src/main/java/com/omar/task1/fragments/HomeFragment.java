@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
                         if (userModelResponse.code() == 200){
                             UserModel userModel = userModelResponse.body();
 
-                            Glide.with(getContext()).load(Const.BASE_URL+"file/"+userModel.getProfileImage()).into(profileImg);
+                            Glide.with(getContext()).load(Const.BASE_URL+"file/"+userModel.getProfileImage()).placeholder(R.drawable.ic_profile).into(profileImg);
                         }
                     }
 
