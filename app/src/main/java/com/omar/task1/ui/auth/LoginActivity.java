@@ -1,24 +1,17 @@
-package com.omar.task1;
+package com.omar.task1.ui.auth;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 import android.content.Intent;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -29,24 +22,21 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.omar.task1.HomeActivity;
+import com.omar.task1.R;
+import com.omar.task1.RestorePasswordActivity;
 import com.omar.task1.api.ApiClient;
 import com.omar.task1.api.models.UserLogin;
-import com.omar.task1.api.models.UserModel;
 import com.omar.task1.api.services.UserService;
 import com.omar.task1.db.AppDatabase;
 import com.omar.task1.db.entity.User;
 import com.omar.task1.utils.MySharedPref;
 
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.omar.task1.utils.Utils;
 
 import org.json.JSONObject;
@@ -243,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToRestorePasswordActivity(){
-        Intent intent = new Intent(this,RestorePasswordActivity.class);
+        Intent intent = new Intent(this, RestorePasswordActivity.class);
         startActivity(intent);
     }
 

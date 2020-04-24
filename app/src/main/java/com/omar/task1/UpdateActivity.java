@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.content.Context;
@@ -15,11 +14,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,16 +25,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.SellerModel;
 import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.models.UserType;
 import com.omar.task1.api.services.ImageService;
+import com.omar.task1.api.services.SellerService;
 import com.omar.task1.api.services.UserService;
 import com.omar.task1.app.Const;
-import com.omar.task1.db.AppDatabase;
-import com.omar.task1.db.entity.User;
+import com.omar.task1.ui.auth.LoginActivity;
 import com.omar.task1.utils.MySharedPref;
 import com.omar.task1.utils.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,7 +44,6 @@ import java.io.OutputStream;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -99,8 +95,38 @@ public class UpdateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update);
-        initViews(null);
-        getUser();
+        UserModel user = null;
+        initViews(user);
+        if(MySharedPref.getInstance(this).getUserType() == UserType.CUSTOMER) {
+            getUser();
+        }else{
+            getSeller();
+        }
+
+    }
+
+    private void getSeller() {
+        String token = MySharedPref.getInstance(this).isLoggedIn();
+
+
+
+
+        ApiClient.getClient(this).create(SellerService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<SellerModel>>() {
+                    @Override
+                    public void onSuccess(Response<SellerModel> userModelResponse) {
+                        if (userModelResponse.code() == 200){
+
+                        initViews(userModelResponse.body());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
 
     }
 
@@ -138,6 +164,61 @@ public class UpdateActivity extends AppCompatActivity {
     }
 
     private void initViews(final UserModel user) {
+
+
+        if (user == null){
+            progressLayout = findViewById(R.id.progressLayout);
+            return;
+        }
+
+
+        btnSave = findViewById(R.id.btnSave);
+
+        etUsername = findViewById(R.id.etUsername);
+        etUsername.setKeyListener(null);
+        etUsername.setText(user.getUsername());
+
+        etPassword = findViewById(R.id.etPassword);
+
+        etEmail = findViewById(R.id.etEmail);
+        etEmail.setText(user.getEmail());
+
+        spinnerGender = findViewById(R.id.spinnerGender);
+        String[] gender = getResources().getStringArray(R.array.gender_array);
+        int pos = 0;
+        if (user.getGender().equals(gender[1])){
+            pos = 1;
+        }
+        spinnerGender.setSelection(pos);
+
+
+        etPhone = findViewById(R.id.etPhone);
+        etPhone.setText(user.getPhone());
+
+        etAddress = findViewById(R.id.etAddress);
+        etAddress.setText(user.getAddress());
+
+        profileImage = findViewById(R.id.profileImage);
+        Glide.with(this).load(Const.BASE_URL + "file/" + user.getProfileImage()).into(profileImage);
+
+
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUser(user);
+            }
+        });
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
+    }
+
+    private void initViews(final SellerModel user) {
 
 
         if (user == null){
@@ -397,6 +478,32 @@ public class UpdateActivity extends AppCompatActivity {
         return valid;
     }
 
+
+    private void updateUser(SellerModel user) {
+
+
+        //final String username = etUsername.getText().toString().trim();
+        String username = user.getUsername();
+        final String password = etPassword.getText().toString().trim();
+        final String email = etEmail.getText().toString().trim();
+        final String phone = etPhone.getText().toString().trim();
+        final String address = etAddress.getText().toString().trim();
+        final String gender = spinnerGender.getSelectedItem().toString();
+        user.setPassword(password);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setGender(gender);
+        user.setAddress(address);
+
+        if(!validate(email,phone,address,gender)) return;
+
+
+
+        update(user);
+
+
+
+    }
     private void updateUser(UserModel user) {
 
 
@@ -445,6 +552,44 @@ public class UpdateActivity extends AppCompatActivity {
 
     }
 
+    private void update(final SellerModel user){
+        showProgress();
+        if(file!=null) {
+            ImageService imageService = ApiClient.getClient(this).create(ImageService.class);
+
+            // Create a request body with file and image media type
+            RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
+            // Create MultipartBody.Part using file request-body,file name and part name
+            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
+
+            imageService.uploadImage(part).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                    new DisposableSingleObserver<Response<String>>() {
+                        @Override
+                        public void onSuccess(Response<String> stringResponse) {
+                            if(stringResponse.code() == 200) {
+                                user.setProfileImage(stringResponse.body());
+                                updateUserData(user);
+                            }else{
+                                hideProgress();
+                                Utils.errorAlert(UpdateActivity.this,"Server Error in upload file");
+                                Log.d("",stringResponse.errorBody().toString());
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            hideProgress();
+                            Utils.errorAlert(UpdateActivity.this,"check your connection");
+                            Log.d("","");
+                        }
+                    }
+            );
+
+        }else{
+            updateUserData(user);
+        }
+    }
+
     private void update(final UserModel user){
         showProgress();
         if(file!=null) {
@@ -481,6 +626,40 @@ public class UpdateActivity extends AppCompatActivity {
         }else{
             updateUserData(user);
         }
+    }
+
+    private void updateUserData(SellerModel user){
+        SellerService userService = ApiClient.getClient(this).create(SellerService.class);
+        disposable.add(
+                userService.update(MySharedPref.getInstance(this).isLoggedIn(),user).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                        new DisposableSingleObserver<Response<SellerModel>>(){
+
+                            @Override
+                            public void onSuccess(Response<SellerModel> response) {
+                                if(response.code() == 200){
+                                    //String jwt = response.headers().get("Authorization");
+                                    //MySharedPref.getInstance(RegisterActivity.this).saveLogIn(jwt);
+                                    //goToHomeActivity();
+                                    Utils.errorAlert(UpdateActivity.this,"user have been updated ");
+                                }else{
+                                    if(response.body() != null && response.body().getError() != null)
+                                        Toast.makeText(UpdateActivity.this, response.body().getError() , Toast.LENGTH_SHORT).show();
+                                    else{
+                                        Utils.errorAlert(UpdateActivity.this,"Server Error ");                                    }
+                                }
+                                hideProgress();
+                            }
+
+                            @Override
+                            public void onError(Throwable e)
+                            {
+                                hideProgress();
+                                Utils.errorAlert(UpdateActivity.this,"check your connection");
+                                Log.d("0","" + e.getMessage());
+                            }
+                        }
+                )
+        );
     }
 
     private void updateUserData(UserModel user){

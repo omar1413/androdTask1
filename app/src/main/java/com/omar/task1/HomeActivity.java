@@ -1,41 +1,34 @@
 package com.omar.task1;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.Observer;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Layout;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.material.navigation.NavigationView;
 import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.SellerModel;
 import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.models.UserType;
+import com.omar.task1.api.services.SellerService;
 import com.omar.task1.api.services.UserService;
+import com.omar.task1.api.services.UserTypeService;
 import com.omar.task1.app.Const;
-import com.omar.task1.db.AppDatabase;
-import com.omar.task1.db.entity.User;
 import com.omar.task1.fragments.HomeFragment;
 import com.omar.task1.fragments.ProfileFragment;
+import com.omar.task1.ui.auth.LoginActivity;
 import com.omar.task1.utils.MySharedPref;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -124,7 +117,7 @@ public class HomeActivity extends AppCompatActivity {
         headerTvEmail = navHeader.findViewById(R.id.tvEmail);
         headerTvUsername = navHeader.findViewById(R.id.tvUsername);
 
-        getUser();
+        getUserType();
     }
 
 
@@ -139,9 +132,38 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+    private void getUserType(){
+        String token = MySharedPref.getInstance(this).isLoggedIn();
+
+        ApiClient.getClient(this).create(UserTypeService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<Void>>() {
+                    @Override
+                    public void onSuccess(Response<Void> voidResponse) {
+                        try {
+                            int userType = Integer.parseInt(voidResponse.headers().get(Const.USER_TYPE));
+                            MySharedPref.getInstance(HomeActivity.this).setUserType(userType);
+                            if (voidResponse.headers().get(Const.USER_TYPE).equals(UserType.CUSTOMER)) {
+                                getUser();
+                            } else {
+                                getSeller();
+                            }
+                        }catch (Exception e){
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
+    }
 
     private void getUser() {
         String token = MySharedPref.getInstance(this).isLoggedIn();
+
+
 
         ApiClient.getClient(this).create(UserService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<UserModel>>() {
@@ -149,6 +171,34 @@ public class HomeActivity extends AppCompatActivity {
                     public void onSuccess(Response<UserModel> userModelResponse) {
                         if (userModelResponse.code() == 200){
                             UserModel user = userModelResponse.body();
+                            Glide.with(HomeActivity.this).load(Const.BASE_URL+"file/"+user.getProfileImage()).placeholder(R.drawable.ic_profile).into(headerImgProfile);
+                            headerTvEmail.setText(user.getEmail());
+                            headerTvUsername.setText(user.getUsername());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
+
+    }
+
+
+
+    private void getSeller() {
+        String token = MySharedPref.getInstance(this).isLoggedIn();
+
+
+
+        ApiClient.getClient(this).create(SellerService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<SellerModel>>() {
+                    @Override
+                    public void onSuccess(Response<SellerModel> userModelResponse) {
+                        if (userModelResponse.code() == 200){
+                            SellerModel user = userModelResponse.body();
                             Glide.with(HomeActivity.this).load(Const.BASE_URL+"file/"+user.getProfileImage()).placeholder(R.drawable.ic_profile).into(headerImgProfile);
                             headerTvEmail.setText(user.getEmail());
                             headerTvUsername.setText(user.getUsername());

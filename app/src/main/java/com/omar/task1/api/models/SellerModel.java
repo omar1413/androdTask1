@@ -1,6 +1,6 @@
 package com.omar.task1.api.models;
 
-public class UserModel extends BaseResponse {
+public class SellerModel extends BaseResponse {
 
     private long id;
     private String username;
@@ -9,18 +9,15 @@ public class UserModel extends BaseResponse {
     private String email;
     private String profileImage;
     private String gender;
+    private int userType;
 
 
 
     private String address;
 
-    private int userType;
+    public SellerModel(){}
 
-
-
-    public UserModel(){}
-
-    public UserModel( String username, String password,  String email,String phone, String address, String gender,int userType) {
+    public SellerModel( String username, String password,  String email,String phone, String address, String gender, int userType) {
         //this.id = id;
         this.username = username;
         this.password = password;
@@ -30,6 +27,8 @@ public class UserModel extends BaseResponse {
         this.gender = gender;
         this.userType = userType;
     }
+
+
 
 
     public int getUserType() {

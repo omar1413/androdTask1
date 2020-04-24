@@ -13,6 +13,7 @@ public class MySharedPref {
     private static MySharedPref instance;
 
     private static final String LOGIN_ID = "LOGIN_ID";
+    private static final String USER_TYPE = "USER_TYPE";
 
     private MySharedPref(Context context) {
         prefs = context.getSharedPreferences("myPref", Context.MODE_PRIVATE);
@@ -76,5 +77,16 @@ public class MySharedPref {
 
     public String getEmail(){
         return prefs.getString("fb_email",null);
+    }
+
+
+    public void setUserType(int userType){
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(USER_TYPE,userType);
+        editor.apply();
+    }
+
+    public int getUserType(){
+        return prefs.getInt(USER_TYPE,0);
     }
 }

@@ -1,10 +1,9 @@
-package com.omar.task1;
+package com.omar.task1.ui.auth;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.content.Context;
@@ -15,11 +14,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,25 +23,26 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.omar.task1.HomeActivity;
+import com.omar.task1.R;
 import com.omar.task1.api.ApiClient;
 import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.models.UserType;
 import com.omar.task1.api.services.ImageService;
 import com.omar.task1.api.services.UserService;
-import com.omar.task1.db.AppDatabase;
-import com.omar.task1.db.entity.User;
 import com.omar.task1.utils.MySharedPref;
 import com.omar.task1.utils.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -55,7 +52,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class RegisterActivity extends AppCompatActivity {
+public class CustomerRegisterActivity extends AppCompatActivity {
 
     private Button btnRegister;
     private EditText etUsername;
@@ -69,10 +66,13 @@ public class RegisterActivity extends AppCompatActivity {
 
     private String mGender;
 
+    String sellerId = "";
+
 
     private static final int CAMERA_REQUEST = 1;
     private static final int GALLERY_REQUEST = 2;
     private static final int MY_PERMISSION_CODE = 102;
+    private static final int MY_GALLERY_PERMISSION_CODE = 103;
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -96,7 +96,25 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_customer_register);
+
+        Uri data = this.getIntent().getData();
+        if (data != null && data.isHierarchical()) {
+            String uri = this.getIntent().getDataString();
+            try {
+                URL u = new URL(uri);
+                String p = u.getPath();
+
+                sellerId = p.replace("/","");
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                finish();
+                return;
+            }
+
+        }
 
         initViews();
     }
@@ -158,7 +176,7 @@ public class RegisterActivity extends AppCompatActivity {
                     //bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
 //                    bitmap=getResizedBitmap(bitmap, 400);
                     //IDProf.setImageBitmap(bitmap);
-                   // BitMapToString(bitmap);
+                    // BitMapToString(bitmap);
                     profileImage.setImageBitmap(bitmap);
 
 
@@ -258,10 +276,14 @@ public class RegisterActivity extends AppCompatActivity {
 //                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 //                    startActivityForResult(intent, 1);
                 }
-                else if (options[item].equals("Choose from Gallery"))
-                {
-                    Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, GALLERY_REQUEST);
+                else if (options[item].equals("Choose from Gallery")) {
+                    if (!hasPermissions(CustomerRegisterActivity.this, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        ActivityCompat.requestPermissions(CustomerRegisterActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_GALLERY_PERMISSION_CODE);
+                        //requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, GALLERY_REQUEST);
+                    }
                 }
                 else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
@@ -304,6 +326,17 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, " permission granted", Toast.LENGTH_LONG).show();
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+        if(requestCode == MY_GALLERY_PERMISSION_CODE){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, GALLERY_REQUEST);
             }
             else
             {
@@ -366,7 +399,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-        signUp(new UserModel(username,password,email,phone,address,gender));
+        signUp(new UserModel(username,password,email,phone,address,gender, UserType.CUSTOMER));
 //        AppDatabase.getInstance(this).getUserDao().getUser(username).observe(this, new Observer<User>() {
 //            @Override
 //            public void onChanged(User user) {
@@ -413,7 +446,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 signUpUserData(user);
                             }else{
                                 hideProgress();
-                                Utils.errorAlert(RegisterActivity.this,"Server Error in upload file");
+                                Utils.errorAlert(CustomerRegisterActivity.this,"Server Error in upload file");
                                 Log.d("",stringResponse.errorBody().toString());
                             }
                         }
@@ -421,7 +454,7 @@ public class RegisterActivity extends AppCompatActivity {
                         @Override
                         public void onError(Throwable e) {
                             hideProgress();
-                            Utils.errorAlert(RegisterActivity.this,"check your connection");
+                            Utils.errorAlert(CustomerRegisterActivity.this,"check your connection");
                             Log.d("","");
                         }
                     }
@@ -435,20 +468,20 @@ public class RegisterActivity extends AppCompatActivity {
     private void signUpUserData(UserModel user){
         UserService userService = ApiClient.getClient(this).create(UserService.class);
         disposable.add(
-                userService.signup(user).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                userService.signup(user,sellerId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                         new DisposableSingleObserver<Response<UserModel>>(){
 
                             @Override
                             public void onSuccess(Response<UserModel> response) {
                                 if(response.code() == 200){
                                     String jwt = response.headers().get("Authorization");
-                                    MySharedPref.getInstance(RegisterActivity.this).saveLogIn(jwt);
+                                    MySharedPref.getInstance(CustomerRegisterActivity.this).saveLogIn(jwt);
                                     goToHomeActivity();
                                 }else{
                                     if(response.body() != null && response.body().getError() != null)
-                                        Toast.makeText(RegisterActivity.this, response.body().getError() , Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(CustomerRegisterActivity.this, response.body().getError() , Toast.LENGTH_SHORT).show();
                                     else{
-                                        Utils.errorAlert(RegisterActivity.this,"User Exist");                                    }
+                                        Utils.errorAlert(CustomerRegisterActivity.this,"User Exist");                                    }
                                 }
                                 hideProgress();
                             }
@@ -457,7 +490,7 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onError(Throwable e)
                             {
                                 hideProgress();
-                                Utils.errorAlert(RegisterActivity.this,"check your connection");
+                                Utils.errorAlert(CustomerRegisterActivity.this,"check your connection");
                                 Log.d("0","" + e.getMessage());
                             }
                         }
@@ -471,13 +504,7 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
 
 
-        finish();
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        goToLoginActivity();
+        //finish();
 
     }
 

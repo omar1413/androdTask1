@@ -16,8 +16,8 @@ import retrofit2.http.Path;
 
 public interface UserService {
 
-    @POST("users/sign-up")
-    Single<Response<UserModel>> signup(@Body UserModel user);
+    @POST("users/sign-up/{sellerId}")
+    Single<Response<UserModel>> signup(@Body UserModel user,@Path("sellerId") String sellerId);
 
 
     @GET("users")

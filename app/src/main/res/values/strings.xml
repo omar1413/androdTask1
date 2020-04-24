@@ -57,6 +57,10 @@
     <string name="btn_save">save</string>
     <string name="btn_edit">Edit</string>
     <string name="code_sent">Code have been sent to email</string>
+    <string name="seller_btn_text">Seller</string>
+    <string name="customer_btn_text">Customer</string>
+    <string name="seller_register_label">Seller Register</string>
+    <string name="customer_register_label">Customer Register</string>
 
     <string-array name="gender_array">
 

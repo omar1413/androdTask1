@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -16,10 +18,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/LoginTheme">
-        <activity android:name=".UpdateActivity"></activity>
+        <activity android:name=".ui.auth.SellerRegisterActivity"></activity>
+        <activity android:name=".ui.auth.CustomerRegisterActivity" >
+            <intent-filter>
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="http"
+                    android:host="www.omar-task1.com" />
+            </intent-filter>
+
+        </activity>
+        <activity android:name=".UpdateActivity" />
         <activity android:name=".NewPasswordActivity" />
         <activity android:name=".RestorePasswordActivity" />
         <activity android:name=".CheckCodeActivity" />
+
+
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -30,15 +47,16 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
         <activity android:name=".HomeActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".ui.auth.RegisterActivity" />
+        <activity android:name=".ui.auth.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RestorePasswordActivity" />
+
+
     </application>
 
 </manifest>

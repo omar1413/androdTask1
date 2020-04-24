@@ -18,7 +18,10 @@ import com.bumptech.glide.Glide;
 import com.omar.task1.R;
 import com.omar.task1.UpdateActivity;
 import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.SellerModel;
 import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.models.UserType;
+import com.omar.task1.api.services.SellerService;
 import com.omar.task1.api.services.UserService;
 import com.omar.task1.app.Const;
 import com.omar.task1.utils.MySharedPref;
@@ -106,7 +109,43 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        getUser();
+        if(MySharedPref.getInstance(getActivity()).getUserType() == UserType.CUSTOMER) {
+            getUser();
+        }else{
+            getSeller();
+        }
+    }
+
+
+    private void getSeller() {
+        String token = MySharedPref.getInstance(getActivity()).isLoggedIn();
+
+
+
+
+        ApiClient.getClient(getContext()).create(SellerService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<SellerModel>>() {
+                    @Override
+                    public void onSuccess(Response<SellerModel> userModelResponse) {
+                        if (userModelResponse.code() == 200){
+                            SellerModel user = userModelResponse.body();
+                            Glide.with(getContext()).load(Const.BASE_URL + "file/" + user.getProfileImage()).placeholder(R.drawable.ic_profile).into(imgProfile);
+                            tvUsername.setText(user.getUsername());
+                            tvEmail.setText(user.getEmail());
+                            tvPhone.setText(user.getPhone());
+                            tvAddress.setText(user.getAddress());
+                            tvGender.setText(user.getGender());
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
+
     }
 
     private void goToEditActivity(){

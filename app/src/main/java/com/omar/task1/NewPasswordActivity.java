@@ -12,9 +12,9 @@ import android.widget.Toast;
 
 import com.omar.task1.api.ApiClient;
 import com.omar.task1.api.services.ResetPasswordService;
+import com.omar.task1.ui.auth.LoginActivity;
 import com.omar.task1.utils.Utils;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;

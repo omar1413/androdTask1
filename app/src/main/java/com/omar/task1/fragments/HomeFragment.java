@@ -1,5 +1,6 @@
 package com.omar.task1.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,15 +10,22 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.omar.task1.HomeActivity;
 import com.omar.task1.R;
 import com.omar.task1.api.ApiClient;
+import com.omar.task1.api.models.SellerModel;
 import com.omar.task1.api.models.UserModel;
+import com.omar.task1.api.models.UserType;
+import com.omar.task1.api.services.SellerService;
 import com.omar.task1.api.services.UserService;
+import com.omar.task1.api.services.UserTypeService;
 import com.omar.task1.app.Const;
 import com.omar.task1.utils.MySharedPref;
+import com.omar.task1.utils.Utils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -41,6 +49,11 @@ public class HomeFragment extends Fragment {
 
     private MySharedPref prefs;
     private ImageView profileImg;
+
+    private UserModel user;
+    private SellerModel sellerModel;
+
+    private Button shareBtn;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -85,15 +98,86 @@ public class HomeFragment extends Fragment {
 
         initViews(view);
 
-        getProfilePic();
+        getUserType();
+
+
+
     }
 
 
-    private void getProfilePic(){
-        prefs = MySharedPref.getInstance(getActivity());
-        String jwt = prefs.isLoggedIn();
-        UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
-        userService.get(jwt).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+    public void share(String text){
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        startActivity(shareIntent);
+    }
+
+
+//    private void getUserProfilePic(){
+//        prefs = MySharedPref.getInstance(getActivity());
+//        String jwt = prefs.isLoggedIn();
+//        UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
+//        userService.get(jwt).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+//                new DisposableSingleObserver<Response<UserModel>>() {
+//                    @Override
+//                    public void onSuccess(Response<UserModel> userModelResponse) {
+//                        if (userModelResponse.code() == 200){
+//                            UserModel userModel = userModelResponse.body();
+//
+//                            Glide.with(getContext()).load(Const.BASE_URL+"file/"+userModel.getProfileImage()).placeholder(R.drawable.ic_profile).into(profileImg);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//                }
+//        );
+//
+//    }
+
+
+
+    private void getUserType(){
+        String token = MySharedPref.getInstance(getActivity()).isLoggedIn();
+
+        ApiClient.getClient(getContext()).create(UserTypeService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<Void>>() {
+                    @Override
+                    public void onSuccess(Response<Void> voidResponse) {
+                        try {
+                            int userType = Integer.parseInt(voidResponse.headers().get(Const.USER_TYPE));
+                            MySharedPref.getInstance(getActivity()).setUserType(userType);
+                            if (userType == UserType.CUSTOMER) {
+                                getUser();
+                            } else {
+                                getSeller();
+                            }
+                        }catch (Exception e){
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
+    }
+
+
+
+    private void getUser() {
+        String token = MySharedPref.getInstance(getActivity()).isLoggedIn();
+
+
+
+        ApiClient.getClient(getContext()).create(UserService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 new DisposableSingleObserver<Response<UserModel>>() {
                     @Override
                     public void onSuccess(Response<UserModel> userModelResponse) {
@@ -101,6 +185,36 @@ public class HomeFragment extends Fragment {
                             UserModel userModel = userModelResponse.body();
 
                             Glide.with(getContext()).load(Const.BASE_URL+"file/"+userModel.getProfileImage()).placeholder(R.drawable.ic_profile).into(profileImg);
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }
+        );
+
+    }
+
+
+
+    private void getSeller() {
+        String token = MySharedPref.getInstance(getActivity()).isLoggedIn();
+
+        shareBtn.setVisibility(View.VISIBLE);
+
+
+        ApiClient.getClient(getContext()).create(SellerService.class).get(token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                new DisposableSingleObserver<Response<SellerModel>>() {
+                    @Override
+                    public void onSuccess(Response<SellerModel> userModelResponse) {
+                        if (userModelResponse.code() == 200){
+                            sellerModel = userModelResponse.body();
+
+                            Glide.with(getContext()).load(Const.BASE_URL+"file/"+sellerModel.getProfileImage()).placeholder(R.drawable.ic_profile).into(profileImg);
+
                         }
                     }
 
@@ -118,7 +232,18 @@ public class HomeFragment extends Fragment {
 
 
         profileImg = view.findViewById(R.id.profilePic);
+        shareBtn = view.findViewById(R.id.shareBtn);
 
+        shareBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sellerModel !=null){
+                    share("http://www.omar-task1.com/"+sellerModel.getId());
+                }else{
+                    Utils.errorAlert(getContext(),"check you connectio");
+                }
+            }
+        });
 
     }
 }
